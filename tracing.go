@@ -31,7 +31,7 @@ func Start(ctx context.Context, name string) trace.Span {
 	return span
 }
 
-func Initialize(ctx context.Context, c *Config) {
+func Initialize(ctx context.Context, c *Config) error {
 	if c != nil {
 		projectID = c.ProjectID
 		serviceName = c.ServiceName
@@ -41,7 +41,7 @@ func Initialize(ctx context.Context, c *Config) {
 
 	exporter, err := texporter.New(texporter.WithProjectID(projectID))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	res, err := resource.New(ctx,
 		resource.WithDetectors(gcp.NewDetector()),
@@ -52,7 +52,7 @@ func Initialize(ctx context.Context, c *Config) {
 		),
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	tp = sdktrace.NewTracerProvider(
@@ -62,6 +62,7 @@ func Initialize(ctx context.Context, c *Config) {
 	)
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+	return nil
 }
 
 func Finalize(ctx context.Context) {
