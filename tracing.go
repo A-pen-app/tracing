@@ -66,5 +66,7 @@ func Initialize(ctx context.Context, c *Config) error {
 }
 
 func Finalize(ctx context.Context) {
-	tp.Shutdown(ctx)
+	if tp != nil {
+		tp.Shutdown(ctx)
+	}
 }
