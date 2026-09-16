@@ -31,9 +31,11 @@ type Config struct {
 	TimeoutInSeconds      int64  `json:"timeout_in_seconds" yaml:"timeout_in_seconds"`
 }
 
-// Start creates a new span for a given name
+// Start creates a new span for a given name. It reads the global provider,
+// which Initialize installs; before that it is OpenTelemetry's no-op provider,
+// so callers never need tracing set up (unit tests, tools).
 func Start(ctx context.Context, name string) trace.Span {
-	_, span := tp.Tracer(tracerName).Start(ctx, name)
+	_, span := otel.Tracer(tracerName).Start(ctx, name)
 	return span
 }
 
